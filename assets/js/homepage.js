@@ -2,6 +2,7 @@ var userFormEl = document.querySelector("#user-form"); // get <form> id
 var nameInputEl = document.querySelector("#username"); // get text <input> id
 var repoContainerEl = document.querySelector("#repos-container"); // get <div>
 var repoSearchTerm = document.querySelector("#repo-search-term"); // get <span> search term
+var languageButtonsEl = document.querySelector("#language-buttons") // get <div> id
 
 var getUserRepos = function(user) {
     // format the github api url
@@ -91,5 +92,41 @@ var displayRepos = function(repos, searchTerm) {
     }
 
 };
-  
+
+var getFeaturedRepos = function(language) {
+    // create API endpoint
+    var apiUrl = "https://api.github.com/search/repositories?q=" + language + "+is:featured&sort=help-wanted-issues";
+
+    // make HTTP request to endpoint
+    fetch(apiUrl).then(function(res) {
+        if (res.ok) {
+            // extract JSON from the response, parse response
+            res.json().then(function(data) {
+                displayRepos(data.items, language);
+            });
+        }
+        else {
+            alert("Error: GH user not found");
+        }
+
+    });
+
+};
+
+var buttonClickHandler = function(event) {
+    var language = event.target.getAttribute("data-language");
+
+    if (language) {
+        // get repos
+        getFeaturedRepos(language);
+      
+        // clear old content
+        repoContainerEl.textContent = "";
+    }
+
+    console.log(language);
+};
+
 userFormEl.addEventListener("submit", formSubmitHandler);
+
+languageButtonsEl.addEventListener("click", buttonClickHandler);
